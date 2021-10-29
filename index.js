@@ -1,12 +1,11 @@
 const express = require('express');
-var bodyParser = require('body-parser');
 
 const { books } = require('./DB');
 const Book  = require('./Book.js');
 
 const app = express();
 
-app.use(bodyParser.text({type: '*/*'}));
+app.use(express.json());
 
 app.post('/api/user/login', (req, res) => {
     res.status(201);
@@ -30,8 +29,7 @@ app.get('/api/books/:id', (req, res) => {
 });
 
 app.post('/api/books', (req, res) => {
-    const body = JSON.parse(req.body);
-    const newBookData = body.newBookData;
+    const newBookData = req.body.newBookData;
 
     const newBook = new Book(newBookData);
     books.push(newBook);
@@ -41,8 +39,7 @@ app.post('/api/books', (req, res) => {
 });
 
 app.put('/api/books/:id', (req, res) => {
-    const body = JSON.parse(req.body);
-    const newBookData = body.newBookData;
+    const newBookData = req.body.newBookData;
     const {id} = req.params;
     const idx = books.findIndex(el => el.id === id);
 
