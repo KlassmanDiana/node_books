@@ -11,7 +11,8 @@
   "devDependencies": {},
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "books": "index.js"
+    "books": "index.js",
+    "start": "node index.js"
   },
   "author": "klassman",
   "license": "ISC"
