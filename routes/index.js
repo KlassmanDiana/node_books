@@ -2,7 +2,15 @@ const express = require('express');
 const router = express.Router();
 
 router.get('/', (req, res) => {
-    res.send('<h1>Index<h1>');
+    res.render("index", {
+        title: "Главная",
+    });
+});
+
+router.get('/404', (req, res) => {
+    res.render("error/404", {
+        title: "Ошибка!!!",
+    });
 });
 
 module.exports = router;

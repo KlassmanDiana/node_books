@@ -1,9 +1,9 @@
 const DB = {
     books: [
         {
-            id: "25456",
+            id: 1,
             title: "Земля королей",
-            description: "string",
+            description: "description",
             authors: "string",
             favorite: "string",
             fileCover: "string",
@@ -12,9 +12,9 @@ const DB = {
             fileBook: "public/pdf/earth-kings.pdf",
           },
           {
-            id: "5743",
+            id: 2,
             title: "Энола Холмс",
-            description: "string",
+            description: "description",
             authors: "string",
             favorite: "string",
             fileCover: "string",
@@ -23,9 +23,9 @@ const DB = {
             fileBook: "public/pdf/enola-holms.pdf",
           },
           {
-            id: "2367",
+            id: 3,
             title: "Том и джерри",
-            description: "string",
+            description: "description",
             authors: "string",
             favorite: "string",
             fileCover: "string",

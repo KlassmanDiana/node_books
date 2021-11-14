@@ -1,9 +1,9 @@
 const express = require('express');
 const router = express.Router();
-const fileMiddleware = require('../middleware/file');
+const fileMiddleware = require('../../middleware/file.js');
 
-const { books } = require('../DB');
-const Book  = require('../Book.js');
+const { books } = require('../../DB.js');
+const Book  = require('../../Book.js');
 
 // получение всех книг
 router.get('/', (req, res) => {

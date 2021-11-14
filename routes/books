@@ -1,0 +1,90 @@
+const express = require('express');
+const router = express.Router();
+
+const { books } = require('../DB');
+const Book  = require('../Book.js');
+
+// получение всех книг
+router.get('/', (req, res) => {
+    res.render("books/index", {
+        title: "All books",
+        books: books,
+    });
+});
+
+// создать книгу - форма
+router.get('/create', (req, res) => {
+    console.log("777");
+    res.render("books/create", {
+        title: "Book | create",
+        book: {},
+    });
+});
+
+// создать книгу - форма
+router.post('/create', (req, res) => {
+    const {title, description} = req.body;
+    const newBook = new Book({title, description});
+    books.push(newBook);
+    res.redirect('/books');
+});
+
+// получение книги по id
+router.get('/:id', (req, res) => {
+    const {id} = req.params;
+    const idx = books.findIndex(el => Number(el.id) === Number(id));
+
+    if (idx !== -1) {
+        res.render("books/view", {
+            title: "Book | view",
+            book: books[idx],
+        });
+    } else {
+        res.status(404).redirect('/404');
+    }
+});
+
+// обновить книгу - форма
+router.get('/update/:id', (req, res) => {
+    const {id} = req.params;
+    const idx = books.findIndex(el => Number(el.id) === Number(id));
+
+    if (idx !== -1) {
+        res.render("books/update", {
+            title: "Book | view",
+            book: books[idx],
+        });
+    } else {
+        res.status(404).redirect('/404');
+    }
+});
+
+// обновить книгу
+router.post('/update/:id', (req, res) => {
+    const {id} = req.params;
+    const {title, description} = req.body;
+    const idx = books.findIndex(el => Number(el.id) === Number(id));
+
+    if (idx !== -1) {
+        books[idx].title = title;
+        books[idx].description = description;
+        res.redirect(`/books/${id}`);
+    } else {
+        res.status(404).redirect('/404');
+    }
+});
+
+// удалить книгу
+router.post('/delete/:id', (req, res) => {
+    const {id} = req.params;
+    const idx = books.findIndex(el => Number(el.id) === Number(id));
+
+    if (idx !== -1) {
+        books.splice(idx, 1);
+        res.redirect(`/books`);
+    } else {
+        res.status(404).redirect('/404');
+    }
+});
+
+module.exports = router;
