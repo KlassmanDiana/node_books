@@ -1,70 +1,38 @@
 const express = require('express');
 
-const { books } = require('./DB');
-const Book  = require('./Book.js');
+// middleware
+const loggerMiddleware = require('./middleware/logger');
+const errorMiddleware = require('./middleware/error');
 
+// отдельные роуты
+const indexRouter = require('./routes/index');
+const authRouter = require('./routes/auth');
+const booksRouter = require('./routes/books');
+
+// зкемпляр приложения
 const app = express();
 
 app.use(express.json());
 
-app.post('/api/user/login', (req, res) => {
-    res.status(201);
-    res.json({ id: 1, mail: "test@mail.ru" });
-});
+// логирование
+app.use(loggerMiddleware);
 
-app.get('/api/books', (req, res) => {
-    res.json(books);
-});
+// роутер для статики
+app.use('/public', express.static(__dirname + "/public"));
 
-app.get('/api/books/:id', (req, res) => {
-    const {id} = req.params;
-    const idx = books.findIndex(el => el.id === id);
+// роутер для /
+app.use('/', indexRouter);
 
-    if (idx !== -1) {
-        res.json(books[idx]);
-    } else {
-        res.status(404);
-        res.json("Not found");
-    }
-});
+// роутер для авторизации
+app.use('/api/user', authRouter);
 
-app.post('/api/books', (req, res) => {
-    const newBookData = req.body.newBookData;
+// роутер для книг
+app.use('/api/books', booksRouter);
 
-    const newBook = new Book(newBookData);
-    books.push(newBook);
+// ошибки
+app.use(errorMiddleware);
 
-    res.status(201);
-    res.json(newBook);
-});
-
-app.put('/api/books/:id', (req, res) => {
-    const newBookData = req.body.newBookData;
-    const {id} = req.params;
-    const idx = books.findIndex(el => el.id === id);
-
-    if (idx !== -1) {
-        books[idx] = newBookData;
-        res.json(books[idx]);
-    } else {
-        res.status(404);
-        res.json("Not found");
-    }
-});
-
-app.delete('/api/books/:id', (req, res) => {
-    const {id} = req.params;
-    const idx = books.findIndex(el => el.id === id);
-
-    if (idx !== -1) {
-        books.splice(idx, 1);
-        res.json("OK, book is deleted");
-    } else {
-        res.status(404);
-        res.json("Not found");
-    }
-});
-
+// прослушивание порта
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
