@@ -36,4 +36,4 @@ db.books.updateOne(
 )
 
 Публикация образа
-https://hub.docker.com/repositories
+https://hub.docker.com/repository/docker/dianaklassman/library
