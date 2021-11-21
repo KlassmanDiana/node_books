@@ -1,0 +1,31 @@
+ version: "3.7"
+ 
+ services:
+  redis:
+    image: redis
+    volumes:
+      - redis_data:/data
+  books:
+    build: ./book_service
+    environment:
+      - PORT=3001
+  counter:
+    build: ./counter_service
+    environment:
+      - PORT=3002
+      - REDIS_URL=redis
+    depends_on:
+      - redis
+  nginx:
+    image: nginx:stable-alpine
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/conf.d/nginx.conf
+    depends_on:
+      - redis
+      - books
+      - counter
+ volumes:
+  redis_data:
+      

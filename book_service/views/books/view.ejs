@@ -23,7 +23,31 @@
 
             </div>
         </div>
+        Просмотров: <span class="counters">0</span>
     </div>
 </div>
 
 <%- include("../partials/layout-end") %>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function(event) {
+        const counterElem = document.querySelector(".counters");
+        const bookId = location.pathname.split('/')[2];
+
+        async function incrCounter() {
+            const response = await fetch(`/counter/${bookId}/incr`, {method: 'POST'});
+            return await response.json();
+        }
+
+        async function getCounter() {
+            const response = await fetch(`/counter/${bookId}`, {method: 'GET'});
+            const counter = await response.json();
+            console.log(counter);
+            if(!counterElem || !counter) return;
+            counterElem.textContent = Number(counter.cnt);
+        }
+
+        incrCounter();
+        getCounter();
+    });
+</script>
