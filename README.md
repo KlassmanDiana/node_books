@@ -34,3 +34,6 @@ db.books.updateOne(
      $set: { description: "new description", authors: "new authors" }
    }
 )
+
+Публикация образа
+https://hub.docker.com/repositories
