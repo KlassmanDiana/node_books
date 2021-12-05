@@ -15,6 +15,47 @@ const booksRouter = require('./routes/books');
 // сокет
 const socketIO = require('socket.io');
 
+// авторизация
+const passport = require('passport')
+const LocalStrategy = require('passport-local').Strategy
+
+const db = require('./db/index.js')
+
+function verify (username, password, done) {
+    db.users.findByUsername(username, function (err, user) {
+      if (err) { return done(err) }
+      if (!user) { return done(null, false) }
+  
+      if (!db.users.verifyPassword(user, password)) { return done(null, false) }
+  
+      // `user` будет сохранен в `req.user`
+      return done(null, user)
+    })
+
+    // return done(null, { id: 1, mail: "test@mail.ru" })
+  }
+
+const options = {
+    usernameField: 'username',
+    passwordField: 'password',
+    passReqToCallback: false,
+  }
+  
+  //  Добавление стратегии для использования
+  passport.use('local', new LocalStrategy(options, verify))
+  
+  // Конфигурирование Passport для сохранения пользователя в сессии
+  passport.serializeUser(function (user, cb) {
+    cb(null, user.id)
+  })
+  
+  passport.deserializeUser(function (id, cb) {
+    db.users.findById(id, function (err, user) {
+      if (err) { return cb(err) }
+      cb(null, user)
+    })
+  })
+
 // зкемпляр приложения
 const app = express();
 const server = http.Server(app);
@@ -24,7 +65,18 @@ const io = socketIO(server);
 app.set("view engine", "ejs");
 
 app.use(express.json());
-app.use(bodyParser.urlencoded({extended: false}));
+// app.use(bodyParser.urlencoded({extended: false}));
+app.use(require('body-parser').urlencoded({ extended: true }))
+
+app.use(require('express-session')({
+    // secret: process.env.COOKIE_SECRET,
+    secret: '12345',
+    resave: false,
+    saveUninitialized: false,
+  }))
+
+app.use(passport.initialize())
+app.use(passport.session())
 
 // логирование
 app.use(loggerMiddleware);
