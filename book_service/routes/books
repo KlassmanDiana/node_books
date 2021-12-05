@@ -1,90 +1,170 @@
 const express = require('express');
 const router = express.Router();
 
-const { books } = require('../DB');
-const Book  = require('../Book.js');
+// const { books } = require('../DB');
+// const Book  = require('../Book.js');
+
+const Book = require('../models/book');
 
 // получение всех книг
-router.get('/', (req, res) => {
+router.get('/', async (req, res) => {
+    // res.render("books/index", {
+    //     title: "All books",
+    //     books: books,
+    // });
+
+    const books = await Book.find();
+    console.log(req.user)
     res.render("books/index", {
         title: "All books",
         books: books,
+        user: req.user 
     });
 });
 
 // создать книгу - форма
 router.get('/create', (req, res) => {
-    console.log("777");
     res.render("books/create", {
         title: "Book | create",
         book: {},
+        user: req.user 
     });
 });
 
 // создать книгу - форма
-router.post('/create', (req, res) => {
+router.post('/create', async (req, res) => {
+    // const {title, description} = req.body;
+    // const newBook = new Book({title, description});
+    // books.push(newBook);
+    // res.redirect('/books');
+
     const {title, description} = req.body;
-    const newBook = new Book({title, description});
-    books.push(newBook);
-    res.redirect('/books');
+
+    const newBook = new Book({
+        title, 
+        description,
+    });
+
+    try {
+        await newBook.save();
+        res.redirect('/books');
+    } catch (e) {
+        console.error(e);
+    }
 });
 
 // получение книги по id
-router.get('/:id', (req, res) => {
-    const {id} = req.params;
-    const idx = books.findIndex(el => Number(el.id) === Number(id));
+router.get('/:id', async (req, res) => {
+    // const {id} = req.params;
+    // const idx = books.findIndex(el => Number(el.id) === Number(id));
 
-    if (idx !== -1) {
-        res.render("books/view", {
-            title: "Book | view",
-            book: books[idx],
-        });
-    } else {
+    // if (idx !== -1) {
+    //     res.render("books/view", {
+    //         title: "Book | view",
+    //         book: books[idx],
+    //     });
+    // } else {
+    //     res.status(404).redirect('/404');
+    // }
+
+    const {id} = req.params;
+    let book;
+
+    try {
+        book = await Book.findById(id);
+    } catch (e) {
+        console.error(e);
         res.status(404).redirect('/404');
     }
+
+    res.render("books/view", {
+        title: "Book | view",
+        book: book,
+        user: req.user 
+    });
 });
 
 // обновить книгу - форма
-router.get('/update/:id', (req, res) => {
-    const {id} = req.params;
-    const idx = books.findIndex(el => Number(el.id) === Number(id));
+router.get('/update/:id', async (req, res) => {
+    // const {id} = req.params;
+    // const idx = books.findIndex(el => Number(el.id) === Number(id));
 
-    if (idx !== -1) {
-        res.render("books/update", {
-            title: "Book | view",
-            book: books[idx],
-        });
-    } else {
+    // if (idx !== -1) {
+    //     res.render("books/update", {
+    //         title: "Book | view",
+    //         book: books[idx],
+    //     });
+    // } else {
+    //     res.status(404).redirect('/404');
+    // }
+
+    const {id} = req.params;
+    console.log(id)
+    let book;
+    try {
+        book = await Book.findById(id);
+        console.log(book)
+    } catch (e) {
+        console.error(e);
         res.status(404).redirect('/404');
     }
+
+    res.render("books/update", {
+        title: "Book | view",
+        book: book,
+        user: req.user 
+    });
 });
 
 // обновить книгу
-router.post('/update/:id', (req, res) => {
+router.post('/update/:id', async (req, res) => {
+    // const {id} = req.params;
+    // const {title, description} = req.body;
+    // const idx = books.findIndex(el => Number(el.id) === Number(id));
+
+    // if (idx !== -1) {
+    //     books[idx].title = title;
+    //     books[idx].description = description;
+    //     res.redirect(`/books/${id}`);
+    // } else {
+    //     res.status(404).redirect('/404');
+    // }
+
     const {id} = req.params;
     const {title, description} = req.body;
-    const idx = books.findIndex(el => Number(el.id) === Number(id));
 
-    if (idx !== -1) {
-        books[idx].title = title;
-        books[idx].description = description;
-        res.redirect(`/books/${id}`);
-    } else {
+    try {
+        await Book.findByIdAndUpdate(id, {title, description});
+    } catch (e) {
+        console.error(e);
         res.status(404).redirect('/404');
     }
+
+    res.redirect(`/books/${id}`);
 });
 
 // удалить книгу
-router.post('/delete/:id', (req, res) => {
-    const {id} = req.params;
-    const idx = books.findIndex(el => Number(el.id) === Number(id));
+router.post('/delete/:id', async (req, res) => {
+    // const {id} = req.params;
+    // const idx = books.findIndex(el => Number(el.id) === Number(id));
 
-    if (idx !== -1) {
-        books.splice(idx, 1);
-        res.redirect(`/books`);
-    } else {
+    // if (idx !== -1) {
+    //     books.splice(idx, 1);
+    //     res.redirect(`/books`);
+    // } else {
+    //     res.status(404).redirect('/404');
+    // }
+
+    const {id} = req.params;
+
+    try {
+        await Book.deleteOne({_id: id});
+    } catch (e) {
+        console.error(e);
         res.status(404).redirect('/404');
     }
+
+    res.redirect(`/books`);
 });
 
 module.exports = router;

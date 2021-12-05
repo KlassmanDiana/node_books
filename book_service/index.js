@@ -1,6 +1,7 @@
 const express = require('express');
 const http = require('http');
 const bodyParser = require("body-parser");
+require('dotenv').config();
 
 // middleware
 const loggerMiddleware = require('./middleware/logger');
@@ -14,6 +15,9 @@ const booksRouter = require('./routes/books');
 
 // сокет
 const socketIO = require('socket.io');
+
+// mongoose
+const mongoose = require('mongoose');
 
 // авторизация
 const passport = require('passport')
@@ -146,6 +150,29 @@ io.on('connection', (socket) => {
 
 // прослушивание порта
 const PORT = process.env.PORT || 3000;
-server.listen(PORT, () => {
-    console.log(`Server is running on port ${PORT}`);
-});
+const UserDB = process.env.DB_USERNAME;
+const PasswordDB = process.env.DB_PASSWORD;
+const NameDB = process.env.DB_NAME;
+const HostDb = process.env.DB_HOST;
+
+console.log(HostDb)
+
+async function start() {
+    try {
+        await mongoose.connect(HostDb, {
+            user: UserDB,
+            pass: PasswordDB,
+            dbName: NameDB,
+            useNewUrlParser: true,
+            useUnifiedTopology: true
+        });
+
+        server.listen(PORT, () => {
+            console.log(`Server is running on port ${PORT}`);
+        });
+    } catch (e) {
+        console.log(e);
+    }
+}
+
+start();
