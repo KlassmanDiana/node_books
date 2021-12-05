@@ -2,7 +2,6 @@ const records = [
     {
       id: 1,
       username: 'jack',
-      // TODO: не хранить пароли в БД
       password: 'secret',
       displayName: 'Jack',
       emails: [{ value: 'jack@example.com' }],
@@ -46,6 +45,5 @@ const records = [
   }
   
   exports.verifyPassword = (user, password) => {
-    // TODO: не хранить пароли в БД
     return user.password === password
   }
